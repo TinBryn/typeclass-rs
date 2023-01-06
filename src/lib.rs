@@ -58,8 +58,6 @@ impl<T: ApplyMut> Apply for T {
     }
 }
 
-
-
 pub struct OptionInstance;
 
 impl Higher for OptionInstance {
@@ -85,5 +83,50 @@ impl Point for OptionInstance {
 impl ApplyOnce for OptionInstance {
     fn apply_once<A, B, F: FnOnce(A) -> B>(fa: Self::Kind<A>, ff: Self::Kind<F>) -> Self::Kind<B> {
         fa.and_then(|a| ff.map(|f| f(a)))
+    }
+}
+
+pub struct VecInstance;
+
+impl Higher for VecInstance {
+    type Kind<T> = Vec<T>;
+}
+
+impl<T> TypeConstructor<T> for Vec<T> {
+    type Instance = VecInstance;
+}
+
+impl FunctorMut for VecInstance {
+    fn fmap_mut<A, B, F: FnMut(A) -> B>(fa: Self::Kind<A>, f: F) -> Self::Kind<B> {
+        fa.into_iter().map(f).collect()
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    fn ints_to_strs<T: TypeConstructor<i32>>(ints: T) -> <T::Instance as Higher>::Kind<String>
+    where
+        T::Instance: Functor,
+    {
+        T::Instance::fmap(ints, |i: i32| i.to_string())
+    }
+
+    #[test]
+    fn option_fmap_ints_to_strs() {
+        let ints = Some(3);
+        let strs = ints_to_strs(ints);
+        assert_eq!(strs, Some("3".to_string()));
+    }
+
+    #[test]
+    fn vec_fmap_ints_to_strs() {
+        let ints = vec![1, 2, 3];
+        let strs = ints_to_strs(ints);
+        assert_eq!(
+            strs,
+            vec!["1".to_string(), "2".to_string(), "3".to_string()]
+        );
     }
 }
