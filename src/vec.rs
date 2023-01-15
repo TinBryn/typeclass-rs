@@ -10,6 +10,12 @@ impl FunctorMutImpl for VecImpl {
     }
 }
 
+impl Point for VecImpl {
+    fn point<A>(a: A) -> Self::Kind<A> {
+        vec![a]
+    }
+}
+
 impl ApplyMutImpl for VecImpl {
     fn apply_mut<A, B, F: FnMut(A) -> B>(fa: Self::Kind<A>, ff: Self::Kind<F>) -> Self::Kind<B> {
         ff.into_iter().zip(fa).map(|(mut f, a)| f(a)).collect()
