@@ -10,7 +10,7 @@ impl FunctorMutImpl for VecImpl {
     }
 }
 
-impl Point for VecImpl {
+impl PointImpl for VecImpl {
     fn point<A>(a: A) -> Self::Kind<A> {
         vec![a]
     }

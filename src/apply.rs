@@ -3,24 +3,15 @@ pub use implementation::{ApplyImpl, ApplyMutImpl, ApplyOnceImpl};
 
 use crate::prelude::*;
 
-pub trait Apply<A>: Higher<A>
-where
-    Self::Impl: ApplyImpl,
-{
+pub trait Apply<A>: Higher<A> {
     fn apply<B, F: Fn(A) -> B>(self, ff: Self::With<F>) -> Self::With<B>;
 }
 
-pub trait ApplyMut<A>: Apply<A>
-where
-    Self::Impl: ApplyMutImpl,
-{
+pub trait ApplyMut<A>: Apply<A> {
     fn apply_mut<B, F: FnMut(A) -> B>(self, ff: Self::With<F>) -> Self::With<B>;
 }
 
-pub trait ApplyOnce<A>: ApplyMut<A>
-where
-    Self::Impl: ApplyOnceImpl,
-{
+pub trait ApplyOnce<A>: ApplyMut<A> {
     fn apply_once<B, F: FnOnce(A) -> B>(self, ff: Self::With<F>) -> Self::With<B>;
 }
 

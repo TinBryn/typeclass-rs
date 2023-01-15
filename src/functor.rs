@@ -1,48 +1,29 @@
 mod implementation;
 pub use implementation::{FunctorImpl, FunctorMutImpl, FunctorOnceImpl};
 
-use crate::higher::{HigherKind, Higher};
+use crate::higher::{Higher, HigherKind};
 
-pub trait Functor<A>: Higher<A>
-where
-    Self::Impl: FunctorImpl,
-{
+pub trait Functor<A>: Higher<A> {
     //! Functor ergonomic trait, this gets blanket implemented when the
     //! `FunctorImpl` trait is implemented and is how this typeclass should be
     //! used.
-    //!
-    //! note: the constraint `Self::Impl: FunctorImpl` doesn't seem to remove the
-    //! need to specify this constraint when used. It would be nice if it could be
-    //! inferred based on this trait having it.
     fn fmap<B, F: Fn(A) -> B>(self, f: F) -> Self::With<B>;
 }
 
-pub trait FunctorMut<A>: Functor<A>
-where
-    Self::Impl: FunctorMutImpl,
-{
+pub trait FunctorMut<A>: Functor<A> {
     //! `FunctorMut` ergonomic trait, this gets blanket implemented when the
     //! `FunctorMutImpl` trait is implemented and is how this typeclass should be
     //! used. This can be used as a `Functor` as it will just be provided with a
     //! `FnMut` that doesn't actually mutate anything.
-    //!
-    //! note: the constraint `Self::Impl: FunctorMutImpl` doesn't seem to remove the
-    //! need to specify this constraint when used. It would be nice if it could be
-    //! inferred based on this trait having it.
+
     fn fmap_mut<B, F: FnMut(A) -> B>(self, f: F) -> Self::With<B>;
 }
 
-pub trait FunctorOnce<A>: FunctorMut<A>
-where
-    Self::Impl: FunctorOnceImpl,
-{
+pub trait FunctorOnce<A>: FunctorMut<A> {
     //! `FunctorOnce` ergonomic trait, this gets blanket implemented when the
     //! `FunctorOnceImpl` trait is implemented and is how this typeclass should be
     //! used. This can be used as a `FunctorMut`.
-    //!
-    //! note: the constraint `Self::Impl: FunctorOnceImpl` doesn't seem to remove the
-    //! need to specify this constraint when used. It would be nice if it could be
-    //! inferred based on this trait having it.
+
     fn fmap_once<B, F: FnOnce(A) -> B>(self, f: F) -> Self::With<B>;
 }
 

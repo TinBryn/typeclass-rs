@@ -23,19 +23,11 @@ mod vec;
 mod test {
     use crate::prelude::*;
 
-    fn ints_to_strs<F>(ints: F) -> F::With<String>
-    where
-        F: Functor<i32>,
-        F::Impl: FunctorImpl,
-    {
+    fn ints_to_strs<F: Functor<i32>>(ints: F) -> F::With<String> {
         Functor::fmap(ints, |i| i.to_string())
     }
 
-    fn ints_to_strs_with_index<F>(ints: F) -> F::With<(usize, String)>
-    where
-        F: FunctorMut<i32>,
-        F::Impl: FunctorMutImpl,
-    {
+    fn ints_to_strs_with_index<F: FunctorMut<i32>>(ints: F) -> F::With<(usize, String)> {
         let mut index = 0;
         FunctorMut::fmap_mut(ints, |i| {
             let result = (index, i.to_string());

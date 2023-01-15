@@ -1,4 +1,4 @@
-use crate::prelude::{ApplyOnceImpl, BindOnceImpl, FunctorOnceImpl, HigherImpl, HigherKind, Point};
+use crate::prelude::{ApplyOnceImpl, BindOnceImpl, FunctorOnceImpl, HigherImpl, HigherKind, PointImpl};
 
 // stores the E, it doesn't matter as this type is never meant to be instantiated
 pub struct ResultImpl<E>(E);
@@ -17,7 +17,7 @@ impl<E> FunctorOnceImpl for ResultImpl<E> {
     }
 }
 
-impl<E> Point for ResultImpl<E> {
+impl<E> PointImpl for ResultImpl<E> {
     fn point<A>(a: A) -> Self::Kind<A> {
         Ok(a)
     }

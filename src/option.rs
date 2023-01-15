@@ -10,7 +10,7 @@ impl FunctorOnceImpl for OptionImpl {
     }
 }
 
-impl Point for OptionImpl {
+impl PointImpl for OptionImpl {
     fn point<A>(a: A) -> Self::Kind<A> {
         Some(a)
     }
