@@ -16,8 +16,8 @@ pub mod prelude {
 }
 
 mod option;
-mod vec;
 mod result;
+mod vec;
 
 #[cfg(test)]
 mod test {
@@ -29,6 +29,19 @@ mod test {
         F::Impl: FunctorImpl,
     {
         Functor::fmap(ints, |i| i.to_string())
+    }
+
+    fn ints_to_strs_with_index<F>(ints: F) -> F::With<(usize, String)>
+    where
+        F: FunctorMut<i32>,
+        F::Impl: FunctorMutImpl,
+    {
+        let mut index = 0;
+        FunctorMut::fmap_mut(ints, |i| {
+            let result = (index, i.to_string());
+            index += 1;
+            result
+        })
     }
 
     #[test]
@@ -53,5 +66,19 @@ mod test {
         let ints: Result<_, !> = Ok(3);
         let strs = ints_to_strs(ints);
         assert_eq!(strs, Ok("3".to_string()));
+    }
+
+    #[test]
+    fn fmap_with_mutable_functor_on_vec() {
+        let ints = vec![1, 2, 3];
+        let strs = ints_to_strs_with_index(ints);
+        assert_eq!(
+            strs,
+            vec![
+                (0, "1".to_string()),
+                (1, "2".to_string()),
+                (2, "3".to_string())
+            ]
+        );
     }
 }

@@ -1,9 +1,9 @@
 mod implementation;
 pub use implementation::{FunctorImpl, FunctorMutImpl, FunctorOnceImpl};
 
-use crate::higher::{Higher, HigherWith};
+use crate::higher::{HigherKind, Higher};
 
-pub trait Functor<A>: HigherWith<A>
+pub trait Functor<A>: Higher<A>
 where
     Self::Impl: FunctorImpl,
 {
@@ -46,7 +46,7 @@ where
     fn fmap_once<B, F: FnOnce(A) -> B>(self, f: F) -> Self::With<B>;
 }
 
-impl<A, T: Higher<A>> Functor<A> for T
+impl<A, T: HigherKind<A>> Functor<A> for T
 where
     Self::Impl: FunctorImpl,
 {
@@ -56,7 +56,7 @@ where
     }
 }
 
-impl<A, T: Higher<A>> FunctorMut<A> for T
+impl<A, T: HigherKind<A>> FunctorMut<A> for T
 where
     Self::Impl: FunctorMutImpl,
 {
@@ -66,7 +66,7 @@ where
     }
 }
 
-impl<A, T: Higher<A>> FunctorOnce<A> for T
+impl<A, T: HigherKind<A>> FunctorOnce<A> for T
 where
     Self::Impl: FunctorOnceImpl,
 {
