@@ -23,19 +23,19 @@ mod vec;
 mod test {
     use crate::prelude::*;
 
-    fn to_strs<F: Functor>(ints: F) -> F::With<String>
+    fn to_strs<F: Functor>(things: F) -> F::With<String>
     where
         F::Item: ToString,
     {
-        Functor::fmap(ints, |i| i.to_string())
+        Functor::fmap(things, |i| i.to_string())
     }
 
-    fn to_strs_with_index<F: FunctorMut>(ints: F) -> F::With<(usize, String)>
+    fn to_strs_with_index<F: FunctorMut>(things: F) -> F::With<(usize, String)>
     where
         F::Item: ToString,
     {
         let mut index = 0;
-        FunctorMut::fmap_mut(ints, |i| {
+        FunctorMut::fmap_mut(things, |i| {
             let result = (index, i.to_string());
             index += 1;
             result
