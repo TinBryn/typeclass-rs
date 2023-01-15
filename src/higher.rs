@@ -2,8 +2,9 @@
 /// For example, this is implemented for `Option<T>` and provides the type
 /// `OptionImpl`. This is co-constrained by the trait `HigherImpl` which must
 /// also be implemented on the correct type.
-pub trait HigherKind<T> {
-    type Impl: HigherImpl<Kind<T> = Self>;
+pub trait HigherKind {
+    type Item;
+    type Impl: HigherImpl<Kind<Self::Item> = Self>;
 }
 
 /// This allows a type to provide instances of another type that have a generic
@@ -11,7 +12,7 @@ pub trait HigherKind<T> {
 /// `Kind<T> = Option<T>`. This is co-constrained by the trait `HigherKind` which
 /// must also be implemented on the correct type.
 pub trait HigherImpl {
-    type Kind<T>: HigherKind<T, Impl = Self>;
+    type Kind<T>: HigherKind<Item = T, Impl = Self>;
 }
 
 /// The traits `HigherImpl` and `HigherKind` are co-constrained and this macro
@@ -23,7 +24,8 @@ macro_rules! implHigher {
         impl HigherImpl for $ImplIdent {
             type Kind<T> = $TypeIdent<T>;
         }
-        impl<T> HigherKind<T> for $TypeIdent<T> {
+        impl<T> HigherKind for $TypeIdent<T> {
+            type Item = T;
             type Impl = $ImplIdent;
         }
     };
@@ -31,10 +33,10 @@ macro_rules! implHigher {
 
 /// An ergonomic trait that is blanket implemented to avoid nested use of
 /// fully qualified syntax.
-pub trait Higher<A>: HigherKind<A> {
-    type With<T>: HigherKind<T, Impl = Self::Impl>;
+pub trait Higher: HigherKind {
+    type With<T>: HigherKind<Item = T, Impl = Self::Impl>;
 }
 
-impl<A, T: HigherKind<A>> Higher<A> for T {
-    type With<B> = <<Self as HigherKind<A>>::Impl as HigherImpl>::Kind<B>;
+impl<T: HigherKind> Higher for T {
+    type With<B> = <<Self as HigherKind>::Impl as HigherImpl>::Kind<B>;
 }

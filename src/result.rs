@@ -1,4 +1,6 @@
-use crate::prelude::{ApplyOnceImpl, BindOnceImpl, FunctorOnceImpl, HigherImpl, HigherKind, PointImpl};
+use crate::prelude::{
+    ApplyOnceImpl, BindOnceImpl, FunctorOnceImpl, HigherImpl, HigherKind, PointImpl,
+};
 
 // stores the E, it doesn't matter as this type is never meant to be instantiated
 pub struct ResultImpl<E>(E);
@@ -7,7 +9,8 @@ impl<E> HigherImpl for ResultImpl<E> {
     type Kind<T> = Result<T, E>;
 }
 
-impl<T, E> HigherKind<T> for Result<T, E> {
+impl<T, E> HigherKind for Result<T, E> {
+    type Item = T;
     type Impl = ResultImpl<E>;
 }
 
