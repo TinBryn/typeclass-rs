@@ -1,29 +1,30 @@
-use crate::prelude::*;
+use crate::prelude::{ApplyOnce, BindOnce, FunctorOnce, Higher, Pure};
 
-pub struct OptionImpl;
+impl<A> Higher for Option<A> {
+    type Item = A;
+    type With<T> = Option<T>;
+}
 
-implHigher!(Option, OptionImpl);
-
-impl FunctorOnceImpl for OptionImpl {
-    fn fmap_once<A, B, F: FnOnce(A) -> B>(fa: Self::Kind<A>, f: F) -> Self::Kind<B> {
-        fa.map(f)
+impl<A> FunctorOnce for Option<A> {
+    fn fmap_once<B, F: FnOnce(Self::Item) -> B>(self, f: F) -> Self::With<B> {
+        self.map(f)
     }
 }
 
-impl PointImpl for OptionImpl {
-    fn point<A>(a: A) -> Self::Kind<A> {
+impl<A> Pure for Option<A> {
+    fn pure(a: Self::Item) -> Self {
         Some(a)
     }
 }
 
-impl ApplyOnceImpl for OptionImpl {
-    fn apply_once<A, B, F: FnOnce(A) -> B>(fa: Self::Kind<A>, ff: Self::Kind<F>) -> Self::Kind<B> {
-        fa.and_then(|a| ff.map(|f| f(a)))
+impl<A> ApplyOnce for Option<A> {
+    fn apply_once<B, F: FnOnce(Self::Item) -> B>(self, ff: Self::With<F>) -> Self::With<B> {
+        ff.and_then(|f| self.map(f))
     }
 }
 
-impl BindOnceImpl for OptionImpl {
-    fn bind_once<A, B, F: FnOnce(A) -> Self::Kind<B>>(fa: Self::Kind<A>, f: F) -> Self::Kind<B> {
-        fa.and_then(f)
+impl<A> BindOnce for Option<A> {
+    fn bind_once<B, F: FnOnce(Self::Item) -> Self::With<B>>(self, f: F) -> Self::With<B> {
+        self.and_then(f)
     }
 }

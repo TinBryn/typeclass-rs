@@ -1,29 +1,18 @@
 use crate::prelude::*;
 
-pub struct VecImpl;
+impl<A> Higher for Vec<A> {
+    type Item = A;
+    type With<T> = Vec<T>;
+}
 
-implHigher!(Vec, VecImpl);
-
-impl FunctorMutImpl for VecImpl {
-    fn fmap_mut<A, B, F: FnMut(A) -> B>(fa: Self::Kind<A>, f: F) -> Self::Kind<B> {
-        fa.into_iter().map(f).collect()
+impl<A> FunctorMut for Vec<A> {
+    fn fmap_mut<B, F: FnMut(Self::Item) -> B>(self, f: F) -> Self::With<B> {
+        self.into_iter().map(f).collect()
     }
 }
 
-impl PointImpl for VecImpl {
-    fn point<A>(a: A) -> Self::Kind<A> {
+impl<A> Pure for Vec<A> {
+    fn pure(a: Self::Item) -> Self {
         vec![a]
-    }
-}
-
-impl ApplyMutImpl for VecImpl {
-    fn apply_mut<A, B, F: FnMut(A) -> B>(fa: Self::Kind<A>, ff: Self::Kind<F>) -> Self::Kind<B> {
-        ff.into_iter().zip(fa).map(|(mut f, a)| f(a)).collect()
-    }
-}
-
-impl BindMutImpl for VecImpl {
-    fn bind_mut<A, B, F: FnMut(A) -> Self::Kind<B>>(fa: Self::Kind<A>, f: F) -> Self::Kind<B> {
-        fa.into_iter().flat_map(f).collect()
     }
 }

@@ -1,5 +1,3 @@
-#![feature(never_type)]
-
 pub mod apply;
 pub mod bind;
 pub mod functor;
@@ -11,7 +9,6 @@ pub mod prelude {
     pub use crate::bind::*;
     pub use crate::functor::*;
     pub use crate::higher::*;
-    pub use crate::implHigher;
     pub use crate::point::*;
 }
 
@@ -21,13 +18,15 @@ mod vec;
 
 #[cfg(test)]
 mod test {
+    use std::convert::Infallible;
+
     use crate::prelude::*;
 
     fn to_strs<F: Functor>(things: F) -> F::With<String>
     where
         F::Item: ToString,
     {
-        Functor::fmap(things, |i| i.to_string())
+        things.fmap(|i| i.to_string())
     }
 
     fn to_strs_with_index<F: FunctorMut>(things: F) -> F::With<(usize, String)>
@@ -35,7 +34,7 @@ mod test {
         F::Item: ToString,
     {
         let mut index = 0;
-        FunctorMut::fmap_mut(things, |i| {
+        things.fmap_mut(|i| {
             let result = (index, i.to_string());
             index += 1;
             result
@@ -61,7 +60,7 @@ mod test {
 
     #[test]
     fn result_fmap_ints_to_strs() {
-        let ints: Result<_, !> = Ok(3);
+        let ints: Result<_, Infallible> = Ok(3);
         let strs = to_strs(ints);
         assert_eq!(strs, Ok("3".to_string()));
     }
@@ -78,5 +77,17 @@ mod test {
                 (2, "3".to_string())
             ]
         );
+    }
+
+    #[test]
+    fn make_a_pure_option() {
+        let some: Option<_> = Pure::pure(4);
+        assert_eq!(some, Some(4))
+    }
+
+    #[test]
+    fn make_a_pure_vec() {
+        let v: Vec<_> = Pure::pure(4);
+        assert_eq!(v, vec![4]);
     }
 }
